@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>The Collapse Lab</title>
+  <style>
+*{box-sizing:border-box}body{margin:0;background:#f4f1e8;color:#233d37;font:16px/1.5 system-ui,sans-serif}main{max-width:900px;margin:auto;padding:24px}h1,h2{font-family:Georgia,serif;font-weight:normal;line-height:1.15}h1{font-size:clamp(32px,5vw,54px);margin:12px 0}h2{font-size:27px;margin:12px 0}.eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#4c7064;font-weight:700}.muted{color:#53665e;font-size:13px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #cbd3c8;padding-bottom:12px}.tokens{display:flex;gap:7px}.token{width:13px;height:13px;border-radius:50%;background:#28766b}.spent{background:#d6d9cf}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}button{font:inherit;text-align:left;border:1px solid #b9c8bb;background:#fffdf6;color:#233d37;padding:16px;border-radius:6px;cursor:pointer;width:100%}button:hover,button:focus-visible{border-color:#28766b;background:#e5eee6;outline:2px solid #28766b;outline-offset:2px}button:disabled{opacity:.45;cursor:default}button strong{display:block;font-size:17px}button small{display:block;color:#53665e;margin-top:4px}.primary{background:#245b50;color:white;border-color:#245b50;text-align:center;margin-top:14px}.primary:hover{background:#19463e;color:white}.note{border-left:3px solid #b29254;padding:10px 15px;background:#eae6d9;margin:12px 0}.paper{background:#fffdf6;border:1px solid #d6d5c9;padding:18px;border-radius:5px;margin:14px 0}.result{font:27px/1.2 Georgia,serif}.progress{height:5px;background:#d6d9cf;margin:14px 0}.progress span{display:block;height:100%;background:#28766b;transition:width .3s}details{margin:16px 0}summary{cursor:pointer;font-size:14px}#archive,#conclusions{display:none}footer{border-top:1px solid #cbd3c8;margin-top:20px;padding-top:10px;font-size:12px;color:#53665e}@media(max-width:520px){main{padding:16px}.grid{grid-template-columns:1fr}button{padding:12px}}
+</style>
+</head>
+<html lang="en">
+  <body>
+    <main>
+      <div class="top">
+        <span class="eyebrow">Constructing Collapse / Field exercise</span>
+        <div id="tokens" class="tokens">
+          <span class="token"></span>
+          <span class="token"></span>
+          <span class="token"></span>
+        </div>
+      </div>
+      <h1>The Collapse Lab</h1>
+      <div id="budget" class="muted"></div>
+      <div class="progress">
+        <span id="bar"></span>
+      </div>
+      <section id="stage" aria-live="polite">
+        <h2>Imagine you are investigating the decline of a Maya centre around 900 CE.</h2>
+        <p>You have funding for three investigations. Choose what to study, then decide what your evidence can actually explain.</p>
+        <button id="start" class="primary">Begin investigation</button>
+      </section>
+      <details id="notebook" hidden="hidden" open="open">
+        <summary>
+          Field notebook (
+          <span id="count">0</span>
+          )
+        </summary>
+        <div id="notes"></div>
+      </details>
+      <div id="archive">
+        <button type="button" data-id="climate" data-method="Oxygen isotopes" data-finding="The isotope record suggests several dry decades around 900 CE." data-limit="Rainfall is not a direct measure of social change.">
+          <strong>Sample a cave</strong>
+          <small>Oxygen isotopes</small>
+        </button>
+        <button type="button" data-id="settlement" data-method="Settlement archaeology" data-finding="Occupation declines at the main centre, but nearby settlements remain occupied." data-limit="A settlement survey cannot establish why people moved.">
+          <strong>Survey the settlements</strong>
+          <small>Settlement archaeology</small>
+        </button>
+        <button type="button" data-id="politics" data-method="Epigraphy" data-finding="Royal inscriptions become scarce. Earlier texts document conflict between rulers." data-limit="Fewer inscriptions do not necessarily mean fewer people.">
+          <strong>Read the inscriptions</strong>
+          <small>Epigraphy</small>
+        </button>
+        <button type="button" data-id="land" data-method="Pollen and sediments" data-finding="Maize pollen persists while forest cover begins to recover." data-limit="Vegetation responds to both climate and human activity.">
+          <strong>Core a lake</strong>
+          <small>Pollen and sediments</small>
+        </button>
+      </div>
+      <div id="conclusions">
+        <button type="button" data-kind="0" data-headline="Congratulations! You&#39;ve collapsed an entire civilisation with one graph." data-feedback="A climate signal alone cannot establish social causation.">Drought caused the collapse of the Maya.</button>
+        <button type="button" data-kind="1" data-headline="Congratulations! You&#39;ve turned a political record into a complete social history." data-feedback="Political conflict is a possible explanation, not proof of a region-wide collapse.">Warfare destroyed Maya society.</button>
+        <button type="button" data-kind="2" data-headline="Congratulations! You&#39;ve made an entire population disappear." data-feedback="Decline at one centre does not establish abandonment everywhere.">Everyone abandoned the region.</button>
+        <button type="button" data-kind="3" data-headline="A cautious conclusion. Your reviewer might actually be happy." data-feedback="Different archives constrain different parts of the story. Their dates, scale and limitations still matter.">Several processes may explain local decline, the evidence cannot establish a single cause.</button>
+      </div>
+      <script>
+(()=>{
+const $=id=>document.getElementById(id);
+const cards=[...document.querySelectorAll('#archive button')];
+const conclusions=[...document.querySelectorAll('#conclusions button')];
+let collected=[], finished=false;
+function node(tag,text,cls){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n;}
+function update(){
+ $('budget').textContent=(3-collected.length)+' of 3 investigations left';
+ $('bar').style.width=(collected.length/3*100)+'%';
+ [...$('tokens').children].forEach((n,i)=>n.classList.toggle('spent',i>=3-collected.length));
+}
+function page(title,desc){const p=$('stage');p.replaceChildren(node('h2',title),node('p',desc));return p;}
+function action(p,label,fn){const b=node('button',label,'primary');b.onclick=fn;p.append(b);}
+function notebook(){const n=$('notes');n.replaceChildren();collected.forEach(c=>{const p=node('div','','note');p.append(node('strong',c.dataset.method),node('p',c.dataset.finding));n.append(p)});$('notebook').hidden=!collected.length;$('count').textContent=collected.length;}
+function investigate(){
+ const p=page('Where will you look?','Choose an archive. Each investigation costs one research token.');
+ const g=node('div','','grid');cards.forEach(c=>{let b=c.cloneNode(true);b.disabled=collected.includes(c);if(b.disabled)b.querySelector('small').textContent='Already investigated';b.onclick=()=>discover(c);g.append(b)});p.append(g);
+ if(collected.length)action(p,'Publish with the evidence I have',publish);
+}
+function discover(c){
+ collected.push(c);update();notebook();
+ const p=page('Field note '+collected.length,c.dataset.method);const box=node('div','','paper');box.append(node('div',c.dataset.finding,'result'),node('p',c.dataset.limit,'muted'));p.append(box);
+ action(p,collected.length===3?'Draft your conclusion':'Return to the field',collected.length===3?publish:investigate);
+}
+function publish(){
+ const p=page('Time to publish.','Which conclusion would you defend with your evidence?');
+ const g=node('div','','grid');conclusions.forEach(c=>{const b=c.cloneNode(true);b.onclick=()=>review(c);g.append(b)});p.append(g);
+ if(collected.length<3)action(p,'Collect more evidence',investigate);
+}
+function review(c){
+ finished=true;const p=page('Reviewer 2 has entered the chat.','Decision on your submission');
+ const box=node('div','','paper');let head=c.dataset.headline;
+ if(c.dataset.kind==='0'&&!collected.some(x=>x.dataset.id==='climate'))head="Congratulations! You've diagnosed a drought without a climate record.";
+ if(c.dataset.kind==='3'&&collected.length===1)head='Promising, but your reviewer wants another line of evidence.';
+ box.append(node('div',head,'result'),node('p',c.dataset.feedback));p.append(box);
+ const missed=cards.filter(x=>!collected.includes(x));if(missed.length){const q=node('div','','note');q.append(node('strong','What you did not investigate'),node('p',missed[0].dataset.finding));p.append(q)}
+ p.append(node('p','Same past, different archives, different explanations.','muted'));
+ action(p,'Start a new investigation',reset);
+}
+function reset(){collected=[];finished=false;update();notebook();investigate();}
+$('start').onclick=reset;update();
+})();
+</script>
+    </main>
+  </body>
+</html>
+</html>
